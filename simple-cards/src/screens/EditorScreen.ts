@@ -7,6 +7,7 @@ import { Label } from '../ui/Label';
 import { CMapLayer } from '../map/CMapLayer';
 import { CMap } from '../map/CMap';
 import { MapPoint } from '../map/const';
+import { LargeButton } from '../ui/LargeButton';
 
 const MapSize = [
     {
@@ -62,6 +63,7 @@ export class EditorScreen extends Container {
     private currentSelectEditorMapTile: number = 1;
     private currentSelectEditorMapSize: number[] = [25, 25];
     private touchMap = false;
+    private mapPoint!: number[][];
 
     constructor() {
         super();
@@ -128,7 +130,7 @@ export class EditorScreen extends Container {
         this.editorToolPopup.addChild(mapTilelabel);
 
         // sprites 是你的精灵数组
-        const sprites = [1, 2, 3, 4, 5, 6, 7]; // 假设这里存放了你的精灵对象
+        const sprites = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // 假设这里存放了你的精灵对象
 
         const spritesPerRow = 3; // 每行显示的精灵数量
         const spriteWidth = 56; // 精灵的宽度
@@ -144,10 +146,11 @@ export class EditorScreen extends Container {
             spriteSelect.label = `mapTile${_sprite}`;
             const spriteSelectBg = Sprite.from('editor_tile_select');
             spriteSelectBg.label = `tileBg`;
-            spriteSelectBg.position.set(-4, -5);
+            spriteSelectBg.position.set(-6, -7);
             spriteSelectBg.alpha = this.currentSelectEditorMapTile === _sprite ? 1 : 0;
             spriteSelect.addChild(spriteSelectBg);
             const sprite = Sprite.from(`editor_m${_sprite}`);
+            sprite.scale.set(0.125);
             sprite.interactive = true;
             sprite.eventMode = 'static';
             sprite.onclick = () => {
@@ -159,7 +162,6 @@ export class EditorScreen extends Container {
                 });
                 spriteSelectBg.alpha = 1;
                 this.currentSelectEditorMapTile = _sprite;
-                console.log(this.currentSelectEditorMapTile);
             };
             // 计算当前精灵所在行和列
             const row = Math.floor(index / spritesPerRow); // 当前精灵所在行数
@@ -174,16 +176,27 @@ export class EditorScreen extends Container {
             // 将精灵添加到舞台或容器中
             this.editorToolPopup.addChild(spriteSelect);
         });
+
+        const generateMap = new LargeButton({ text: '生成地图', width: 180, height: 40 });
+        generateMap.position.set(0, 260);
+        generateMap.onPress.connect(() => this.generateMapPoint());
+        this.editorToolPopup.addChild(generateMap);
+    }
+
+    public generateMapPoint() {
+        alert('生成的地图数据是：\n' + JSON.stringify(this.mapPoint));
     }
 
     public initEditorDefaultMap(mapPoint: MapPoint) {
         this.editorLayer = new CMapLayer();
         this.editorLayer.label = 'mapLayer';
+        this.mapPoint = mapPoint;
         mapPoint.forEach((tiles: Array<number>, i: number) => {
             tiles.forEach((_item: number, j: number) => {
-                const x = ((i + 1) % 2 === 0 ? 27 : 0) + j * 52;
+                const x = ((i + 1) % 2 === 0 ? 25 : 0) + j * 50;
                 const y = i * 44;
                 const ct = new CMap(Texture.from(`editor_m${_item}`), this.editorLayer, true);
+                ct.tileId = _item;
                 ct.label = `${i}:${j}`;
                 ct.position.set(x, y);
                 this.editorLayer.addChild(ct);
@@ -198,7 +211,6 @@ export class EditorScreen extends Container {
 
     public calcInAABB(point: Point) {
         if (!this.editorLayer) return;
-        console.log(point);
         // 遍历容器的子元素，查找事件发生的位置是否在子元素范围内
         for (const child of this.editorLayer.children) {
             // 获取子元素的包围盒
@@ -206,13 +218,21 @@ export class EditorScreen extends Container {
 
             // 检查选中的点是否在子元素的包围盒内
             if (bounds.containsPoint(point.x, point.y)) {
-                (child as CMap).setMapTile(Texture.from(`editor_m${this.currentSelectEditorMapTile}`));
+                const mapTile = child as CMap;
+                mapTile.setMapTileId(this.currentSelectEditorMapTile);
+                mapTile.setMapTile(Texture.from(`editor_m${this.currentSelectEditorMapTile}`));
+                const xIdx = +mapTile.label.split(':')[0];
+                const yIdx = +mapTile.label.split(':')[1];
+                if (Array.isArray(this.mapPoint)) {
+                    this.mapPoint[xIdx][yIdx] = mapTile.tileId;
+                }
             }
         }
     }
 
     public onWheelEvent(event: FederatedWheelEvent) {
-        console.log(event);
+        const currentPos = this.editorContainer.position;
+        this.editorContainer.position.set(currentPos.x - event.deltaX, currentPos.y - event.deltaY);
     }
 
     public onPointerdown(event: FederatedPointerEvent) {

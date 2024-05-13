@@ -1,10 +1,10 @@
-import { Container, Point, Sprite, Texture, Ticker } from 'pixi.js';
+import { Container, Point, Sprite, Texture } from 'pixi.js';
 import { MAP_POINT } from '../map/const';
 import { app } from '../main';
 import { copyPoint } from '../utils/tool';
 import { SHORTCUT } from '../utils/global';
 import { CMapLayer } from '../map/CMapLayer';
-import { CMap, Entity } from '../map/CMap';
+import { CMap } from '../map/CMap';
 
 /** The screen that holds the Resistance Actions game */
 export class GameScreen extends Container {
@@ -93,7 +93,7 @@ export class GameScreen extends Container {
     public prepare() {}
 
     /** Update the screen */
-    public update(time: Ticker) {}
+    public update() {}
 
     /** Pause gameplay - automatically fired when a popup is presented */
     public async pause() {}
@@ -105,7 +105,7 @@ export class GameScreen extends Container {
     public reset() {}
 
     /** Resize the screen, fired whenever window size changes */
-    public resize(width: number, height: number) {}
+    public resize() {}
 
     /** Show screen with animations */
     public async show() {
@@ -126,9 +126,6 @@ export class GameScreen extends Container {
     public onKeyUp() {
         SHORTCUT.key = '';
     }
-
-    /** Finish the gameplay, save stats and go to the results */
-    private async finish() {}
 
     /** Auto pause the game when window go out of focus */
     public blur() {}

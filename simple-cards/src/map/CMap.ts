@@ -15,6 +15,7 @@ export class CMap extends Container {
     public cmapLayer;
     public selected = false;
     public isEditorMode = false;
+    public tileId = 0;
 
     constructor(texture: Texture, cmapLayer: CMapLayer, isEditorMode: boolean = false) {
         super();
@@ -23,6 +24,7 @@ export class CMap extends Container {
         this.isEditorMode = isEditorMode;
         this.tileSprite.texture = texture;
         this.tileSprite.anchor.set(0.5);
+        this.tileSprite.scale.set(0.125);
         if (!isEditorMode) {
             this.tileSprite.interactive = true;
             this.tileSprite.eventMode = 'static';
@@ -57,5 +59,9 @@ export class CMap extends Container {
 
     setMapTile(texture: Texture) {
         this.tileSprite.texture = texture;
+    }
+
+    setMapTileId(tileId: number) {
+        this.tileId = tileId;
     }
 }

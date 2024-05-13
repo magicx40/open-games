@@ -7,9 +7,9 @@ const defaultLargeButtonOptions = {
     text: '',
     width: 240,
     height: 50,
-    default: 'button-large',
-    hover: 'button-large-hover',
-    press: 'button-large-press',
+    default: 'button-default',
+    hover: 'button-default',
+    press: 'button-default',
 };
 
 type LargeButtonOptions = typeof defaultLargeButtonOptions;

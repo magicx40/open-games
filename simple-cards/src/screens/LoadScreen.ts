@@ -24,7 +24,7 @@ export class LoadScreen extends Container {
         this.playButton.onPress.connect(() => navigation.showScreen(GameScreen));
         this.addChild(this.playButton);
 
-        this.drawMapButton = new LargeButton({ default: 'net-button', hover: 'net-button', press: 'net-button' });
+        this.drawMapButton = new LargeButton({ default: 'map-button', hover: 'map-button', press: 'map-button' });
         this.drawMapButton.onPress.connect(() => navigation.showScreen(EditorScreen));
         this.addChild(this.drawMapButton);
     }
