@@ -7,6 +7,9 @@ const defaultLargeButtonOptions = {
     text: '',
     width: 240,
     height: 50,
+    default: 'button-large',
+    hover: 'button-large-hover',
+    press: 'button-large-press',
 };
 
 type LargeButtonOptions = typeof defaultLargeButtonOptions;
@@ -16,13 +19,13 @@ type LargeButtonOptions = typeof defaultLargeButtonOptions;
  */
 export class LargeButton extends FancyButton {
     /** The buttoon message displayed */
-    private messageLabel: Label;
+    private messageLabel?: Label;
 
     constructor(options: Partial<LargeButtonOptions> = {}) {
         const opts = { ...defaultLargeButtonOptions, ...options };
 
         const defaultView = new NineSliceSprite({
-            texture: Texture.from('button-large'),
+            texture: Texture.from(opts.default),
             leftWidth: 10,
             topHeight: 10,
             rightWidth: 10,
@@ -32,7 +35,7 @@ export class LargeButton extends FancyButton {
         });
 
         const hoverView = new NineSliceSprite({
-            texture: Texture.from('button-large-hover'),
+            texture: Texture.from(opts.hover),
             leftWidth: 10,
             topHeight: 10,
             rightWidth: 10,
@@ -42,7 +45,7 @@ export class LargeButton extends FancyButton {
         });
 
         const pressedView = new NineSliceSprite({
-            texture: Texture.from('button-large-press'),
+            texture: Texture.from(opts.press),
             leftWidth: 10,
             topHeight: 10,
             rightWidth: 10,
@@ -57,12 +60,13 @@ export class LargeButton extends FancyButton {
             pressedView,
             anchor: 0.5,
         });
-
-        this.messageLabel = new Label(opts.text, {
-            fill: 0x000000,
-            align: 'center',
-        });
-        this.addChild(this.messageLabel);
+        if (opts.text) {
+            this.messageLabel = new Label(opts.text, {
+                fill: 0x000000,
+                align: 'center',
+            });
+            this.addChild(this.messageLabel);
+        }
 
         this.onDown.connect(this.handleDown.bind(this));
         this.onUp.connect(this.handleUp.bind(this));
@@ -79,8 +83,7 @@ export class LargeButton extends FancyButton {
         // sfx.play('common/sfx-press.wav');
     }
 
-    private handleUp() {
-    }
+    private handleUp() {}
 
     /** Show the component */
     public async show(animated = true) {

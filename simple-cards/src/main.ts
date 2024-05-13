@@ -3,8 +3,8 @@ import { Application } from 'pixi.js';
 import { initAssets } from './utils/assets';
 import { navigation } from './utils/navigation';
 import { sound } from '@pixi/sound';
-import { TiledBackground } from './ui/TiledBackground';
 import { LoadScreen } from './screens/LoadScreen';
+import { Background } from './ui/Background';
 
 export const app = new Application();
 
@@ -67,7 +67,7 @@ async function init() {
     await initAssets();
 
     // Add a persisting background shared by all screens
-    navigation.setBackground(TiledBackground);
+    navigation.setBackground(Background);
 
     // Go to one of the screens if a shortcut is present in url params, otherwise go to home screen
     await navigation.showScreen(LoadScreen);
