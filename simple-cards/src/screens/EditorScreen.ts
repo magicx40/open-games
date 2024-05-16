@@ -184,7 +184,8 @@ export class EditorScreen extends Container {
     }
 
     public generateMapPoint() {
-        alert('生成的地图数据是：\n' + JSON.stringify(this.mapPoint));
+        console.log('生成的地图数据是：\n' + JSON.stringify(this.mapPoint));
+        alert('请打开控制台查看地图数据!!!');
     }
 
     public initEditorDefaultMap(mapPoint: MapPoint) {

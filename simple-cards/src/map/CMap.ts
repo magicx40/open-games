@@ -24,19 +24,22 @@ export class CMap extends Container {
         this.isEditorMode = isEditorMode;
         this.tileSprite.texture = texture;
         this.tileSprite.anchor.set(0.5);
-        this.tileSprite.scale.set(0.125);
         if (!isEditorMode) {
+            this.tileSprite.scale.set(0.125);
             this.tileSprite.interactive = true;
             this.tileSprite.eventMode = 'static';
             this.tileSprite.onclick = this.clickHandler.bind(this);
+        } else {
+            this.tileSprite.scale.set(0.125);
         }
 
         this.addChild(this.tileSprite);
         if (!isEditorMode) {
-            this.tileHoverSprite.texture = Texture.from('map_h');
+            this.tileHoverSprite.texture = Texture.from('editor_mh');
             this.tileHoverSprite.interactive = true;
             this.tileHoverSprite.eventMode = 'static';
             this.tileHoverSprite.anchor.set(0.5);
+            this.tileHoverSprite.scale.set(0.125);
             this.tileHoverSprite.alpha = 0;
             this.tileHoverSprite.onclick = this.clickHandler.bind(this);
             this.addChild(this.tileHoverSprite);
@@ -54,7 +57,18 @@ export class CMap extends Container {
             duration: 0.4,
             ease: 'back.out',
         });
-        console.log(this.cmapLayer);
+    }
+
+    setSelected(isSelected = false) {
+        this.selected = isSelected;
+
+        this.cmapLayer.setChildIndex(this, this.cmapLayer.children.length - 1);
+        gsap.killTweensOf(this.tileHoverSprite);
+        gsap.to(this.tileHoverSprite, {
+            alpha: this.selected ? 1 : 0,
+            duration: 0.4,
+            ease: 'back.out',
+        });
     }
 
     setMapTile(texture: Texture) {

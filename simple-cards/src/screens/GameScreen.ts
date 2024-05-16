@@ -1,10 +1,11 @@
-import { Container, Point, Sprite, Texture } from 'pixi.js';
+import { Container, Point, Texture } from 'pixi.js';
 import { MAP_POINT } from '../map/const';
 import { app } from '../main';
 import { copyPoint } from '../utils/tool';
 import { SHORTCUT } from '../utils/global';
 import { CMapLayer } from '../map/CMapLayer';
 import { CMap } from '../map/CMap';
+import { Role, RoleType } from '../map/Role';
 
 /** The screen that holds the Resistance Actions game */
 export class GameScreen extends Container {
@@ -35,10 +36,10 @@ export class GameScreen extends Container {
         mapLayer.label = 'mapLayer';
         MAP_POINT.forEach((tiles: Array<number>, i: number) => {
             tiles.forEach((_item: number, j: number) => {
-                const x = ((i + 1) % 2 === 0 ? 29 : 0) + j * 58;
-                const y = i * 51;
-                const ct = new CMap(Texture.from(`map_${_item}`), mapLayer);
-                ct.label = `${i}:${j}`;
+                const x = ((i + 1) % 2 === 0 ? 25 : 0) + j * 50;
+                const y = i * 44;
+                const ct = new CMap(Texture.from(`editor_m${_item}`), mapLayer);
+                ct.label = `${j}:${i}`;
                 ct.position.set(x, y);
                 mapLayer.addChild(ct);
             });
@@ -55,13 +56,12 @@ export class GameScreen extends Container {
         const mapLayer = this.mapContainer.getChildByLabel('mapLayer') as CMapLayer;
         if (mapLayer && mapLayer.getChildByLabel(`5:12`)) {
             const targetPos = mapLayer.getChildByLabel(`5:12`)!.position;
-            const sp = new Sprite(Texture.from('tank-1'));
-            sp.anchor.set(0.5);
-            sp.scale.set(0.25);
-            sp.interactive = true;
-            sp.eventMode = 'static';
-            sp.position.set(targetPos.x, targetPos.y);
-            entityLayer.addChild(sp);
+            const role = new Role(RoleType.soldiers, '5:12', entityLayer, mapLayer);
+            role.position = targetPos;
+            entityLayer.addChild(role);
+            setTimeout(() => {
+                role.move('5:20');
+            }, 8000);
         }
         this.mapContainer.addChild(entityLayer);
     }
