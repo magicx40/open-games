@@ -48,15 +48,31 @@ export class CMap extends Container {
 
     private clickHandler() {
         if (SHORTCUT.key === ' ' || this.isEditorMode) return;
-        this.selected = !this.selected;
+        const isClickBlank = !this.cmapLayer.selectedMapTiles.includes(this.label);
+        console.log('ddd', this.selected);
+        const reachableTiles = JSON.parse(JSON.stringify(this.cmapLayer.selectedMapTiles));
+        if (reachableTiles.length && isClickBlank) {
+            reachableTiles.forEach((tilePos: string) => {
+                const cmap = this.cmapLayer.getChildByLabel(tilePos) as CMap;
+                if (cmap) {
+                    cmap.setSelected(false);
+                    const needDeleteMapTilePosIndex = reachableTiles.indexOf(tilePos);
+                    if (needDeleteMapTilePosIndex >= 0) {
+                        this.cmapLayer.selectedMapTiles.splice(needDeleteMapTilePosIndex, 1);
+                    }
+                }
+            });
+        } else {
+            this.selected = !this.selected;
 
-        this.cmapLayer.setChildIndex(this, this.cmapLayer.children.length - 1);
-        gsap.killTweensOf(this.tileHoverSprite);
-        gsap.to(this.tileHoverSprite, {
-            alpha: this.selected ? 1 : 0,
-            duration: 0.4,
-            ease: 'back.out',
-        });
+            this.cmapLayer.setChildIndex(this, this.cmapLayer.children.length - 1);
+            gsap.killTweensOf(this.tileHoverSprite);
+            gsap.to(this.tileHoverSprite, {
+                alpha: this.selected ? 1 : 0,
+                duration: 0.4,
+                ease: 'back.out',
+            });
+        }
     }
 
     setSelected(isSelected = false) {

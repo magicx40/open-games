@@ -50,7 +50,7 @@ export function findReachableTiles(
     boardHeight: number,
     hasStartPoint?: boolean,
 ) {
-    const reachableTiles = new Set();
+    const reachableTiles: Set<string> = new Set();
     const queue: { x: number; y: number; distance: number }[] = [{ x: startX, y: startY, distance: 0 }];
     while (queue.length > 0) {
         const current = queue.shift() as { x: number; y: number; distance: number };

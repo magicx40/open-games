@@ -6,6 +6,9 @@ import { SHORTCUT } from '../utils/global';
 import { CMapLayer } from '../map/CMapLayer';
 import { CMap } from '../map/CMap';
 import { Role, RoleType } from '../map/Role';
+import { HexNode } from '../utils/HexNode';
+import { HexCoords } from '../utils/HexCoords.js';
+import { Pathfinding } from '../utils/Pathfinding.js';
 
 /** The screen that holds the Resistance Actions game */
 export class GameScreen extends Container {
@@ -15,6 +18,7 @@ export class GameScreen extends Container {
     public mapContainerOriginalPos = new Point();
     public mouseDownPoint = new Point();
     public touchBlank = false;
+    public moveGridMap: HexNode[] = [];
 
     constructor() {
         super();
@@ -34,6 +38,7 @@ export class GameScreen extends Container {
     public initMapLayer() {
         const mapLayer = new CMapLayer();
         mapLayer.label = 'mapLayer';
+        this.moveGridMap = [];
         MAP_POINT.forEach((tiles: Array<number>, i: number) => {
             tiles.forEach((_item: number, j: number) => {
                 const x = ((i + 1) % 2 === 0 ? 25 : 0) + j * 50;
@@ -42,25 +47,46 @@ export class GameScreen extends Container {
                 ct.label = `${j}:${i}`;
                 ct.position.set(x, y);
                 mapLayer.addChild(ct);
+
+                // 初始化移动map地图
+                this.moveGridMap.push(new HexNode(_item != 9, new HexCoords(j, i)));
             });
         });
+        this.moveGridMap.forEach((tile) => tile.cacheNeighbors(this.moveGridMap));
         this.mapContainer.addChild(mapLayer);
         this.mapContainer.position.set(
             (app.renderer.width - this.mapContainer.width) / 2,
             (app.renderer.height - this.mapContainer.height) / 2,
         );
+        console.log('移动范围地图：', this.moveGridMap);
     }
 
     public initEntity() {
         const entityLayer = new CMapLayer();
         const mapLayer = this.mapContainer.getChildByLabel('mapLayer') as CMapLayer;
-        if (mapLayer && mapLayer.getChildByLabel(`5:12`)) {
-            const targetPos = mapLayer.getChildByLabel(`5:12`)!.position;
-            const role = new Role(RoleType.soldiers, '5:12', entityLayer, mapLayer);
+        if (mapLayer && mapLayer.getChildByLabel(`2:2`)) {
+            const targetPos = mapLayer.getChildByLabel(`2:2`)!.position;
+            const role = new Role(RoleType.soldiers, '2:2', entityLayer, mapLayer);
             role.position = targetPos;
             entityLayer.addChild(role);
+
             setTimeout(() => {
-                role.move('5:20');
+                const startNode = new HexNode(true, new HexCoords(2, 2));
+                const endNode = new HexNode(true, new HexCoords(8, 8));
+                const path = Pathfinding.findPath(startNode, endNode);
+                console.log(path, '1123');
+                if (path) {
+                    console.log('Path found:');
+                    // for (const node of path) {
+                    //     console.log(`(${node.q}, ${node.r})`);
+                    //     if (mapLayer.getChildByLabel(`${node.q}:${node.r}`)) {
+                    //         mapLayer.getChildByLabel(`${node.q}:${node.r}`)?.setMapTile(Texture.from('editor_m1'));
+                    //     }
+                    // }
+                    console.log('最优路径：', path);
+                } else {
+                    console.log('No path found.');
+                }
             }, 8000);
         }
         this.mapContainer.addChild(entityLayer);

@@ -65,10 +65,18 @@ export class Role extends Container {
         const pos = this.pos.split(':');
         const set = findReachableTiles(+pos[0], +pos[1], 3, MAP_POINT[0].length, MAP_POINT.length);
         const reachableTiles = Array.from(set);
-        reachableTiles.forEach((tilePos) => {
-            const cmap = this.cmapLayer.getChildByLabel(tilePos as string) as CMap;
+        reachableTiles.forEach((tilePos: string) => {
+            const cmap = this.cmapLayer.getChildByLabel(tilePos) as CMap;
             if (cmap) {
                 cmap.setSelected(this.selected);
+                if (this.selected) {
+                    this.cmapLayer.selectedMapTiles.push(tilePos);
+                } else {
+                    const needDeleteMapTilePosIndex = this.cmapLayer.selectedMapTiles.indexOf(tilePos);
+                    if (needDeleteMapTilePosIndex >= 0) {
+                        this.cmapLayer.selectedMapTiles.splice(needDeleteMapTilePosIndex, 1);
+                    }
+                }
             }
         });
     }
