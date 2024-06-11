@@ -1,5 +1,5 @@
 // 棋子为偶数行时，周围点的位置
-const e_dir = [
+const o_dir = [
     { dx: 0, dy: -1 }, // 左上
     { dx: -1, dy: 0 }, // 左
     { dx: 0, dy: 1 }, // 左下
@@ -9,7 +9,7 @@ const e_dir = [
 ];
 
 // 棋子为奇数行时，周围点的位置
-const o_dir = [
+const e_dir = [
     { dx: -1, dy: -1 }, // 左上
     { dx: -1, dy: 0 }, // 左
     { dx: -1, dy: 1 }, // 左下

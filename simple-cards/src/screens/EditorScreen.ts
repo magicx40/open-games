@@ -194,7 +194,7 @@ export class EditorScreen extends Container {
         this.mapPoint = mapPoint;
         mapPoint.forEach((tiles: Array<number>, i: number) => {
             tiles.forEach((_item: number, j: number) => {
-                const x = ((i + 1) % 2 === 0 ? 25 : 0) + j * 50;
+                const x = ((i + 1) % 2 === 0 ? -25 : 0) + j * 50;
                 const y = i * 44;
                 const ct = new CMap(Texture.from(`editor_m${_item}`), this.editorLayer, true);
                 ct.tileId = _item;

@@ -1,31 +1,29 @@
 class HexCoords {
-    constructor(q, r) {
+    q: number;
+    r: number;
+
+    constructor(q: number, r: number) {
         this.q = q;
         this.r = r;
-        this.sqrt3 = Math.sqrt(3);
-        this.pos = {
-            x: this.q * this.sqrt3 + this.r * (this.sqrt3 / 2),
-            y: this.r * 1.5,
-        };
     }
 
-    getDistance(other) {
-        return this.axialLength(this.subtract(other));
+    // 计算曼哈顿距离
+    getDistance(other: HexCoords): number {
+        const delta = this.subtract(other);
+        return delta.axialLength();
     }
 
-    subtract(other) {
+    // 计算两个坐标之间的差异
+    subtract(other: HexCoords): HexCoords {
         return new HexCoords(this.q - other.q, this.r - other.r);
     }
 
-    axialLength() {
-        if (this.q === 0 && this.r === 0) return 0;
-        if (this.q > 0 && this.r >= 0) return this.q + this.r;
-        if (this.q <= 0 && this.r > 0) return Math.max(-this.q, this.r);
-        if (this.q < 0) return -this.q - this.r;
-        return Math.max(-this.r, this.q);
+    // 计算轴长度
+    axialLength(): number {
+        return Math.max(Math.abs(this.q), Math.abs(this.r), Math.abs(this.q + this.r));
     }
 
-    toString() {
+    toString(): string {
         return `${this.q}:${this.r}`;
     }
 }

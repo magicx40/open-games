@@ -9,6 +9,7 @@ import { Role, RoleType } from '../map/Role';
 import { HexNode } from '../utils/HexNode';
 import { HexCoords } from '../utils/HexCoords.js';
 import { Pathfinding } from '../utils/Pathfinding.js';
+import gsap from 'gsap';
 
 /** The screen that holds the Resistance Actions game */
 export class GameScreen extends Container {
@@ -41,7 +42,7 @@ export class GameScreen extends Container {
         this.moveGridMap = [];
         MAP_POINT.forEach((tiles: Array<number>, i: number) => {
             tiles.forEach((_item: number, j: number) => {
-                const x = ((i + 1) % 2 === 0 ? 25 : 0) + j * 50;
+                const x = ((i + 1) % 2 === 0 ? -25 : 0) + j * 50;
                 const y = i * 44;
                 const ct = new CMap(Texture.from(`editor_m${_item}`), mapLayer);
                 ct.label = `${j}:${i}`;
@@ -52,7 +53,14 @@ export class GameScreen extends Container {
                 this.moveGridMap.push(new HexNode(_item != 9, new HexCoords(j, i)));
             });
         });
-        this.moveGridMap.forEach((tile) => tile.cacheNeighbors(this.moveGridMap));
+        this.moveGridMap.forEach((tile) =>
+            tile.cacheNeighbors(this.moveGridMap, {
+                minQ: 0,
+                maxQ: MAP_POINT[0].length,
+                minR: 0,
+                maxR: MAP_POINT.length,
+            }),
+        );
         this.mapContainer.addChild(mapLayer);
         this.mapContainer.position.set(
             (app.renderer.width - this.mapContainer.width) / 2,
@@ -64,28 +72,37 @@ export class GameScreen extends Container {
     public initEntity() {
         const entityLayer = new CMapLayer();
         const mapLayer = this.mapContainer.getChildByLabel('mapLayer') as CMapLayer;
-        if (mapLayer && mapLayer.getChildByLabel(`2:2`)) {
-            const targetPos = mapLayer.getChildByLabel(`2:2`)!.position;
-            const role = new Role(RoleType.soldiers, '2:2', entityLayer, mapLayer);
+        if (mapLayer && mapLayer.getChildByLabel(`8:8`)) {
+            const targetPos = mapLayer.getChildByLabel(`8:8`)!.position;
+            const role = new Role(RoleType.soldiers, '8:8', entityLayer, mapLayer);
             role.position = targetPos;
             entityLayer.addChild(role);
 
             setTimeout(() => {
-                const startNode = new HexNode(true, new HexCoords(2, 2));
-                const endNode = new HexNode(true, new HexCoords(8, 8));
-                const path = Pathfinding.findPath(startNode, endNode);
-                console.log(path, '1123');
-                if (path) {
-                    console.log('Path found:');
-                    // for (const node of path) {
-                    //     console.log(`(${node.q}, ${node.r})`);
-                    //     if (mapLayer.getChildByLabel(`${node.q}:${node.r}`)) {
-                    //         mapLayer.getChildByLabel(`${node.q}:${node.r}`)?.setMapTile(Texture.from('editor_m1'));
-                    //     }
-                    // }
-                    console.log('最优路径：', path);
-                } else {
-                    console.log('No path found.');
+                const startNode = this.moveGridMap.find((item) => item.coords.q === 8 && item.coords.r === 8);
+                const endNode = this.moveGridMap.find((item) => item.coords.q === 22 && item.coords.r === 19);
+                if (startNode && endNode) {
+                    const path = Pathfinding.findPath(startNode, endNode);
+                    const moveAction = gsap.timeline();
+                    if (path) {
+                        console.log('Path found:');
+                        console.log(path);
+                        for (const node of path) {
+                            console.log(`(${node.coords.q}, ${node.coords.r})`);
+                            const targetNode = mapLayer.getChildByLabel(`${node.coords.q}:${node.coords.r}`);
+                            if (targetNode) {
+                                // targetNode?.setMapTile(Texture.from('editor_m1'));
+                                moveAction.to(role, {
+                                    x: targetNode.x,
+                                    y: targetNode.y,
+                                    duration: 0.1,
+                                    ease: 'linear',
+                                });
+                            }
+                        }
+                    } else {
+                        console.log('No path found.');
+                    }
                 }
             }, 8000);
         }

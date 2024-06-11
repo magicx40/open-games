@@ -1,5 +1,7 @@
+import { HexNode } from './HexNode';
+
 class Pathfinding {
-    static findPath(startNode, targetNode) {
+    static findPath(startNode: HexNode, targetNode: HexNode) {
         const toSearch = [startNode];
         const processed = new Set();
 
@@ -11,23 +13,24 @@ class Pathfinding {
                 }
             }
 
-            processed.add(current);
+            processed.add(current.coords.toString());
             toSearch.splice(toSearch.indexOf(current), 1);
 
             if (current.coords.toString() === targetNode.coords.toString()) {
-                let currentPathTile = targetNode;
+                let currentPathTile = current;
                 const path = [];
-                while (currentPathTile !== startNode) {
+                while (currentPathTile.coords.toString() !== startNode.coords.toString()) {
                     path.push(currentPathTile);
-                    currentPathTile = currentPathTile.connection;
+                    currentPathTile = currentPathTile.connection as HexNode;
                 }
                 path.reverse();
                 return path;
             }
-            console.log(current, '123123213213');
 
-            for (const neighbor of current.neighbors.filter((t) => t.walkable && !processed.has(t))) {
-                const inSearch = toSearch.includes(neighbor);
+            for (const neighbor of current.neighbors.filter((t) => t.walkable && !processed.has(t.coords.toString()))) {
+                const inSearch = toSearch.some(
+                    (toSearchHexNode) => toSearchHexNode.coords.toString() === neighbor.coords.toString(),
+                );
                 const costToNeighbor = current.g + current.coords.getDistance(neighbor.coords);
 
                 if (!inSearch || costToNeighbor < neighbor.g) {
